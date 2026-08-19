@@ -28,7 +28,7 @@ public class Topping : MonoBehaviour
     {
         if(isTrue == false)
         {
-            GameObject obj = Instantiate(good,transform.position,Quaternion.identity);
+            GameObject obj = Instantiate(good,transform.position - new Vector3(0,0,1),Quaternion.identity);
             StartCoroutine(foodSc.Discover(obj));
             isTrue = true;
         }
