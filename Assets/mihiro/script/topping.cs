@@ -4,6 +4,7 @@ public class Topping : MonoBehaviour
 {
     private Food foodSc; 
     private bool isTrue = true;
+    private bool isDiscovered = false;
     private GameObject good;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -31,6 +32,11 @@ public class Topping : MonoBehaviour
             GameObject obj = Instantiate(good,transform.position - new Vector3(0,0,1),Quaternion.identity);
             StartCoroutine(foodSc.Discover(obj));
             isTrue = true;
+            isDiscovered = true;
+        }
+        else if(isDiscovered)
+        {
+            foodSc.miss();
         }
     }
 }
