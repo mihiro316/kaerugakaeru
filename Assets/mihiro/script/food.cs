@@ -51,14 +51,15 @@ public class Food : MonoBehaviour
         {
             wrong = judge();
             SpriteRenderer itemSr = item.GetComponent<SpriteRenderer>();
+            Topping itemsCs = item.GetComponent<Topping>();
             switch (wrong)
             {
             case 0:
-                itemSr.sprite = spriteT[count];break;
+                itemSr.sprite = spriteT[count];
+                itemsCs.SetUp(foodSc,goodPrefab,true);break;
             case 1:
                 itemSr.sprite = spriteF[count];
-                Topping itemsCs = item.GetComponent<Topping>();
-                itemsCs.SetUp(foodSc,goodPrefab);break;
+                itemsCs.SetUp(foodSc,goodPrefab,false);break;
             }
             wrongCount += wrong;
             count++;
@@ -69,7 +70,7 @@ public class Food : MonoBehaviour
             SpriteRenderer itemSr = items[n].GetComponent<SpriteRenderer>();
             itemSr.sprite = spriteF[n];
             Topping itemsCs = items[n].GetComponent<Topping>();
-            itemsCs.SetUp(foodSc,goodPrefab);
+            itemsCs.SetUp(foodSc,goodPrefab,false);
             wrongCount += 1;
         }
     } 

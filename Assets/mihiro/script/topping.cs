@@ -18,11 +18,15 @@ public class Topping : MonoBehaviour
         
     }
 
-    public void SetUp(Food FSc, GameObject obj)
+    public void SetUp(Food FSc, GameObject obj, bool ft)
     {
-        good = obj;
         foodSc = FSc;
-        isTrue = false;
+        if(!ft)
+        {
+            good = obj;
+            isTrue = false;
+        }
+
     }
 
     private void OnMouseDown()
@@ -34,7 +38,7 @@ public class Topping : MonoBehaviour
             isTrue = true;
             isDiscovered = true;
         }
-        else if(isDiscovered)
+        else if(!isDiscovered)
         {
             foodSc.miss();
         }
