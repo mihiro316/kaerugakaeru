@@ -8,11 +8,14 @@ public class Food : MonoBehaviour
     [SerializeField] private List<GameObject> items;
     [SerializeField] private List<Sprite> spriteT;
     [SerializeField] private List<Sprite> spriteF;
-    private List<GameObject> goods　 = new List<GameObject>();
+    private List<GameObject> goods = new List<GameObject>();
     private GameManager gameManagerSc;
     private Food foodSc;
     private int wrongCount = 0;
     private GameObject goodPrefab;
+    private AudioSource audioSource;
+    private AudioClip goodSe;
+    private AudioClip badSe;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -34,25 +37,29 @@ public class Food : MonoBehaviour
         return 0;
     }
 
-    public void SetUp(GameManager GMSc, GameObject obj)
+    public void SetUp(GameManager GMSc, GameObject obj, AudioClip goodSE, AudioClip badSE)
     {
         goodPrefab = obj;
         foodSc = GetComponent<Food>();
         int count = 0;
         int wrong;
         gameManagerSc = GMSc;
+        audioSource = GetComponent<AudioSource>();
+        goodSe = goodSE;
+        badSe = badSE;
         foreach(GameObject item in items)
         {
             wrong = judge();
             SpriteRenderer itemSr = item.GetComponent<SpriteRenderer>();
+            Topping itemsCs = item.GetComponent<Topping>();
             switch (wrong)
             {
             case 0:
-                itemSr.sprite = spriteT[count];break;
+                itemSr.sprite = spriteT[count];
+                itemsCs.SetUp(foodSc,goodPrefab,true);break;
             case 1:
                 itemSr.sprite = spriteF[count];
-                Topping itemsCs = item.GetComponent<Topping>();
-                itemsCs.SetUp(foodSc,goodPrefab);break;
+                itemsCs.SetUp(foodSc,goodPrefab,false);break;
             }
             wrongCount += wrong;
             count++;
@@ -63,7 +70,7 @@ public class Food : MonoBehaviour
             SpriteRenderer itemSr = items[n].GetComponent<SpriteRenderer>();
             itemSr.sprite = spriteF[n];
             Topping itemsCs = items[n].GetComponent<Topping>();
-            itemsCs.SetUp(foodSc,goodPrefab);
+            itemsCs.SetUp(foodSc,goodPrefab,false);
             wrongCount += 1;
         }
     } 
@@ -72,9 +79,10 @@ public class Food : MonoBehaviour
     {
         wrongCount--;
         goods.Add(good);
+        audioSource.PlayOneShot(goodSe);
         if(wrongCount <= 0)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.3f);
             foreach (GameObject obj in goods)
             {
                 Destroy(obj);
@@ -82,5 +90,9 @@ public class Food : MonoBehaviour
             goods.Clear();
             gameManagerSc.Change();
         }
+    }
+    public void miss()
+    {
+        audioSource.PlayOneShot(badSe);
     }
 }

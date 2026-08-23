@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]private Vector3 foodsPos;
     private GameManager gameManagerSc;
     [SerializeField]private GameObject good;
+    [SerializeField]private AudioClip goodSe;
+    [SerializeField]private AudioClip badSe;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,7 +39,7 @@ public class GameManager : MonoBehaviour
         Destroy(nowFood);
         nowFood = Instantiate(foods[n],foodsPos,Quaternion.identity);
         Food foodSc = nowFood.GetComponent<Food>();
-        foodSc.SetUp(gameManagerSc, good);
+        foodSc.SetUp(gameManagerSc, good, goodSe,badSe);
     }
 
     public void Change()
