@@ -181,16 +181,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::gameManager
   pictureOfFood:
-  - {fileID: 21300000, guid: e130cf800cf7d4857a21fbed545960d1, type: 3}
-  - {fileID: 21300000, guid: 8f92a8c53aed146d1b77ee298f3785cb, type: 3}
   - {fileID: 21300000, guid: 4617b04f715d342fbaa56c56d40d4f35, type: 3}
+  - {fileID: 21300000, guid: bfdf67810d0d142529ecedaf85b6a4fb, type: 3}
   foods:
-  - {fileID: 4601913660075651434, guid: 064c25e6d049a4d20860d695a5fb58be, type: 3}
-  - {fileID: 5826553584578472643, guid: 78fd9fffca8fa426eb665b5b41fe04d6, type: 3}
   - {fileID: 8254308859120457640, guid: 4f3d03ec50dfc428885a0363cbf13818, type: 3}
+  - {fileID: 2072544837942176633, guid: 7136bf9a56a03475aad192cdef7c675b, type: 3}
   menue: {fileID: 1068134796}
   foodsPos: {x: 4, y: 0, z: 0}
   good: {fileID: 6132487687171432967, guid: 864070262d7bd4b208e2c4651fb2497c, type: 3}
+  goodSe: {fileID: 0}
+  badSe: {fileID: 0}
 --- !u!4 &296106585
 Transform:
   m_ObjectHideFlags: 0
@@ -455,7 +455,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ca06a3e6c497e422aa46b376bbaa555d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 44f52555258d04f0bb4ef1e8d3f79af8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -474,7 +474,7 @@ Transform:
   m_GameObject: {fileID: 948899224}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1, z: 26.4}
+  m_LocalPosition: {x: -0.05, y: 0.99, z: 26.4}
   m_LocalScale: {x: 0.41, y: 0.41, z: 0.41}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -810,7 +810,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 3653aa37408f446fe8d2be284112443a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bfdf67810d0d142529ecedaf85b6a4fb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
