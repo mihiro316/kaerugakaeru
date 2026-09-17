@@ -310,7 +310,6 @@ public class SlidePuzzleBoard : MonoBehaviour
         }
         return true;
     }
-
     /// <summary>
     /// クリア時処理
     /// </summary>
@@ -326,6 +325,13 @@ public class SlidePuzzleBoard : MonoBehaviour
         {
             clearMessageText.text = "CLEAR!!";
             clearMessageText.gameObject.SetActive(true);
+        }
+
+        //★ PuzzleManagerにクリアを通知してタイマーをストップさせる
+        PuzzleManager manager = GetComponent<PuzzleManager>();
+        if (manager != null)
+        {
+            manager.OnClear();
         }
 
         Debug.Log("クリアしました！");

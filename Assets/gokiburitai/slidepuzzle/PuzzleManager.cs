@@ -1,123 +1,91 @@
 using UnityEngine;
-
-[System.Serializable]
-public class LevelData
-{
-    public int levelNumber = 1;
-    public int gridSize = 3;       // 3なら3x3、4なら4x4
-    public float timeLimit = 60f;  // 制限時間（秒）
-    public int moveLimit = 30;     // スライド回数制限
-}
+using TMPro; // TextMeshProを使用（標準Textの場合は UnityEngine.UI.Text に変更）
 
 public class PuzzleManager : MonoBehaviour
 {
-    [Header("参照設定")]
-    [Tooltip("同じオブジェクトにあるSlidePuzzleBoard")]
+    [Header("UI表示コンポーネント")]
+    [Tooltip("手数を表示するText (例: 手数: 0)")]
+    public TextMeshProUGUI moveCountText;
+
+    [Tooltip("経過時間を表示するText (例: 時間: 00:00)")]
+    public TextMeshProUGUI timerText;
+
+    [Header("参照")]
     public SlidePuzzleBoard puzzleBoard;
 
-    [Header("レベル設定")]
-    public LevelData[] levels;
-
-    [Header("現在の状態データ")]
-    private int currentLevelIndex = 0;
-    private float currentTime;
-    private int remainingMoves;
+    private int moveCount = 0;
+    private float timer = 0f;
     private bool isGameActive = false;
 
-    // SlidePuzzleBoard 側からゲーム進行状態を確認するためのプロパティ
     public bool IsGameActive => isGameActive;
 
     private void Start()
     {
-        if (puzzleBoard == null)
-        {
-            puzzleBoard = GetComponent<SlidePuzzleBoard>();
-        }
-
-        if (levels != null && levels.Length > 0)
-        {
-            StartLevel(0);
-        }
-        else if (puzzleBoard != null)
-        {
-            puzzleBoard.InitializeBoard(3);
-        }
-    }
-
-    public void StartLevel(int levelIndex)
-    {
-        if (levels == null || levelIndex >= levels.Length) return;
-
-        currentLevelIndex = levelIndex;
-        LevelData config = levels[currentLevelIndex];
-
-        currentTime = config.timeLimit;
-        remainingMoves = config.moveLimit;
-        isGameActive = true;
-
-        GenerateBoard(config.gridSize);
+        // 起動時にパズルを初期化してスタート
+        StartGame();
     }
 
     private void Update()
     {
         if (!isGameActive) return;
 
-        // 時間切れ判定
-        if (currentTime > 0)
+        // 経過時間の更新
+        timer += Time.deltaTime;
+        UpdateTimerUI();
+    }
+
+    /// <summary>
+    /// ゲームの開始 / リスタート
+    /// </summary>
+    public void StartGame()
+    {
+        moveCount = 0;
+        timer = 0f;
+        isGameActive = true;
+
+        UpdateMoveCountUI();
+        UpdateTimerUI();
+
+        if (puzzleBoard != null)
         {
-            currentTime -= Time.deltaTime;
-        }
-        else
-        {
-            currentTime = 0;
-            GameOver("時間切れ！");
+            puzzleBoard.InitializeBoard(3); // 3x3で初期化
         }
     }
 
-    // ピース移動時にSlidePuzzleBoardから呼び出される
+    /// <summary>
+    /// ピースが動くたびに呼び出される処理
+    /// </summary>
     public void OnPieceMoved()
     {
         if (!isGameActive) return;
 
-        remainingMoves--;
-
-        // クリア判定を先に行い、クリアしていなければ手数切れチェックを行う
-        if (CheckIsCleared())
-        {
-            GameClear();
-        }
-        else if (remainingMoves <= 0)
-        {
-            GameOver("手数オーバー！");
-        }
+        moveCount++;
+        UpdateMoveCountUI();
     }
 
-    private void GenerateBoard(int size)
-    {
-        if (puzzleBoard != null)
-        {
-            puzzleBoard.InitializeBoard(size);
-        }
-    }
-
-    private bool CheckIsCleared()
-    {
-        if (puzzleBoard != null)
-        {
-            return puzzleBoard.CheckIsCleared();
-        }
-        return false;
-    }
-
-    private void GameOver(string reason)
+    /// <summary>
+    /// クリア時に呼び出される処理
+    /// </summary>
+    public void OnClear()
     {
         isGameActive = false;
-        Debug.Log($"<color=red>ゲームオーバー: {reason}</color>");
     }
 
-    private void GameClear()
+    private void UpdateMoveCountUI()
     {
-        isGameActive = false;
-        Debug.Log("<color=green>パズルクリア！おめでとうございます！</color>");
+        if (moveCountText != null)
+        {
+            moveCountText.text = $"手数: {moveCount}";
+        }
+    }
+
+    private void UpdateTimerUI()
+    {
+        if (timerText != null)
+        {
+            int minutes = Mathf.FloorToInt(timer / 60f);
+            int seconds = Mathf.FloorToInt(timer % 60f);
+            timerText.text = $"時間: {minutes:00}:{seconds:00}";
+        }
     }
 }
