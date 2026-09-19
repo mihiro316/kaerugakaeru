@@ -16,6 +16,11 @@ public class SlidePuzzleBoard : MonoBehaviour
     [Tooltip("ピースとして使用するUI Buttonプレハブ（ImageとButtonコンポーネントが必須）")]
     public GameObject tilePrefab;
 
+    // ★★★ 追加: 画面横に置く「完成見本用」の UI Image ★★★
+    [Header("見本表示設定")]
+    [Tooltip("画面横に配置した完成見本表示用のUI Image")]
+    public Image referenceImage;
+
     [Header("アニメーション設定")]
     [Tooltip("1マスの移動にかかる時間（秒）")]
     public float moveDuration = 0.15f;
@@ -42,6 +47,17 @@ public class SlidePuzzleBoard : MonoBehaviour
         if (clearMessageText != null)
         {
             clearMessageText.gameObject.SetActive(false);
+        }
+
+        // ★★★ 追加: sourceTexture から Sprite を作成して見本 Image にセット ★★★
+        if (referenceImage != null && sourceTexture != null)
+        {
+            Sprite sampleSprite = Sprite.Create(
+                sourceTexture,
+                new Rect(0, 0, sourceTexture.width, sourceTexture.height),
+                new Vector2(0.5f, 0.5f)
+            );
+            referenceImage.sprite = sampleSprite;
         }
 
         ClearBoard();
@@ -310,6 +326,7 @@ public class SlidePuzzleBoard : MonoBehaviour
         }
         return true;
     }
+
     /// <summary>
     /// クリア時処理
     /// </summary>

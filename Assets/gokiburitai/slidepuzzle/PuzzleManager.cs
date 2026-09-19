@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -47,8 +48,14 @@ public class PuzzleManager : MonoBehaviour
 
     private void Start()
     {
-        // 起動時はレベル選択画面を表示
-        ShowLevelSelectScreen();
+        // レベル選択画面で保存されたレベル番号を取得してパズルを開始する
+        int levelToStart = PuzzleGameManager.SelectedLevel;
+
+        // もし値がセットされていない場合の安全対策（デフォルト1にする）
+        if (levelToStart <= 0) levelToStart = 1;
+    
+        // 取得したレベル番号でパズルを開始！
+        StartLevel(levelToStart);
     }
 
     private void Update()
@@ -193,6 +200,28 @@ public class PuzzleManager : MonoBehaviour
 
             string label = (activeTimeLimit > 0f) ? "残り時間" : "時間";
             timerText.text = $"{label}: {minutes:00}:{seconds:00}";
+        }
+    }
+    [Header("UI表示コンポーネント")]
+    public Image levelPreviewImage; // ★追加：レベル選択画面のプレビュー表示用Image
+
+    /// <summary>
+    /// レベルボタンがホバーされた時やクリックされた時にプレビュー画像を表示する
+    /// </summary>
+    public void ShowLevelPreview(int levelNumber)
+    {
+        LevelData data = levelDataList.Find(l => l.levelNumber == levelNumber); //
+        if (data.levelTexture != null && levelPreviewImage != null)
+        {
+            // Texture2D から Sprite を作成してアタッチ
+            Sprite previewSprite = Sprite.Create(
+                data.levelTexture,
+                new Rect(0, 0, data.levelTexture.width, data.levelTexture.height),
+                new Vector2(0.5f, 0.5f)
+            );
+            
+            levelPreviewImage.sprite = previewSprite;
+            levelPreviewImage.gameObject.SetActive(true);
         }
     }
 }
