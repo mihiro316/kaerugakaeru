@@ -22,4 +22,13 @@ public class LevelSelectManager : MonoBehaviour
     {
         SceneManager.LoadScene("title");
     }
+
+    /// <summary>
+    /// レベル選択画面へ戻るボタン用（★こちらを追加）
+    /// </summary>
+    public void BackToLevelSelect()
+    {
+        // 遷移先のレベル選択シーン名を指定（例: "LevelSelect"）
+        SceneManager.LoadScene("LevelSelect"); 
+    }
 }
