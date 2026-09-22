@@ -16,7 +16,6 @@ public class SlidePuzzleBoard : MonoBehaviour
     [Tooltip("ピースとして使用するUI Buttonプレハブ（ImageとButtonコンポーネントが必須）")]
     public GameObject tilePrefab;
 
-    // ★★★ 追加: 画面横に置く「完成見本用」の UI Image ★★★
     [Header("見本表示設定")]
     [Tooltip("画面横に配置した完成見本表示用のUI Image")]
     public Image referenceImage;
@@ -30,13 +29,13 @@ public class SlidePuzzleBoard : MonoBehaviour
     public TextMeshProUGUI clearMessageText;
 
     private int gridSize = 3;             // 現在の分割数（3x3）
-    private int emptyIndex;               // 現在の空きマスのインデックス（0 ～ totalTiles-1）
-    private int[] boardState;             // 各マスに配置されている元のピースID（クリア判定用）
+    private int emptyIndex;               // 現在の空きマスのインデックス
+    private int[] boardState;             // 各マスに配置されている元のピースID
     private Sprite[] originalSprites;     // 切り分けた元のSprite配列
     private Image[] tileImages;           // 生成した各タイルのImageコンポーネント
     private RectTransform[] tileRects;    // 各タイルのRectTransform
     private bool isCleared = false;       // クリアフラグ
-    private bool isAnimating = false;     // アニメーション中フラグ（連打防止）
+    private bool isAnimating = false;     // アニメーション中フラグ
 
     public void InitializeBoard(int size)
     {
@@ -49,7 +48,7 @@ public class SlidePuzzleBoard : MonoBehaviour
             clearMessageText.gameObject.SetActive(false);
         }
 
-        // ★★★ 追加: sourceTexture から Sprite を作成して見本 Image にセット ★★★
+        // 見本ImageへのSprite設定
         if (referenceImage != null && sourceTexture != null)
         {
             Sprite sampleSprite = Sprite.Create(
@@ -86,12 +85,16 @@ public class SlidePuzzleBoard : MonoBehaviour
         tileImages = new Image[totalTiles];
         tileRects = new RectTransform[totalTiles];
 
+        // -------------------------------------------------------------
+        // ★ 3. 安全装置付き ピースの切り分けと生成 ★
+        // -------------------------------------------------------------
         int sourceWidth = sourceTexture.width;
         int sourceHeight = sourceTexture.height;
-        float cropWidth = (float)sourceWidth / gridSize;
-        float cropHeight = (float)sourceHeight / gridSize;
 
-        // 3. ピースの切り分けと生成
+        // 整数値で1マスあたりのピクセルサイズを計算
+        int baseCropWidth = sourceWidth / gridSize;
+        int baseCropHeight = sourceHeight / gridSize;
+
         for (int i = 0; i < totalTiles; i++)
         {
             boardState[i] = i;
@@ -99,10 +102,17 @@ public class SlidePuzzleBoard : MonoBehaviour
             int row = i / gridSize;
             int col = i % gridSize;
 
-            int texX = Mathf.RoundToInt(col * cropWidth);
-            int texY = Mathf.RoundToInt((gridSize - 1 - row) * cropHeight);
+            // X座標・Y座標の開始位置（整数）
+            int texX = col * baseCropWidth;
+            int texY = (gridSize - 1 - row) * baseCropHeight;
 
-            Rect spriteRect = new Rect(texX, texY, cropWidth, cropHeight);
+            // 安全装置: 切り出し幅・高さを計算し、画像端を超えないように制限 (Mathf.Min)
+            int actualWidth = Mathf.Min(baseCropWidth, sourceWidth - texX);
+            int actualHeight = Mathf.Min(baseCropHeight, sourceHeight - texY);
+
+            // 正確に領域内に収まるRectを生成
+            Rect spriteRect = new Rect(texX, texY, actualWidth, actualHeight);
+            
             Sprite tileSprite = Sprite.Create(
                 sourceTexture,
                 spriteRect,
@@ -123,7 +133,6 @@ public class SlidePuzzleBoard : MonoBehaviour
                 tileImages[i] = img;
             }
 
-            // ボタンクリックイベント（インデックス固定）
             int tileIndex = i;
             Button btn = tileObj.GetComponent<Button>();
             if (btn != null)
@@ -132,17 +141,14 @@ public class SlidePuzzleBoard : MonoBehaviour
             }
         }
 
-        // 初期状態で「最も右下（最後のインデックス）」を空きマスにする
+        // 最右下を空きマスにする
         emptyIndex = totalTiles - 1;
-        tileImages[emptyIndex].color = new Color(1f, 1f, 1f, 0f); // 右下を透明化
+        tileImages[emptyIndex].color = new Color(1f, 1f, 1f, 0f);
 
-        // 4. シャッフル実行（アニメーションなしで高速処理）
+        // シャッフル実行
         ShuffleBoard(gridSize * 30);
     }
 
-    /// <summary>
-    /// シャッフル処理（初期化用：アニメーションなし）
-    /// </summary>
     private void ShuffleBoard(int shuffleSteps)
     {
         int previousIndex = -1;
@@ -163,13 +169,9 @@ public class SlidePuzzleBoard : MonoBehaviour
             emptyIndex = randomIndex;
         }
 
-        // シャッフル後、空きマスを最右下（3行目3列目）まで寄せる
         MoveEmptyTileToBottomRight();
     }
 
-    /// <summary>
-    /// 空きマスを確実に右下（最後のインデックス）までスライド移動させる
-    /// </summary>
     private void MoveEmptyTileToBottomRight()
     {
         int totalTiles = gridSize * gridSize;
@@ -184,11 +186,11 @@ public class SlidePuzzleBoard : MonoBehaviour
 
             if (emptyRow < gridSize - 1)
             {
-                nextIndex = emptyIndex + gridSize; // 下へ
+                nextIndex = emptyIndex + gridSize;
             }
             else if (emptyCol < gridSize - 1)
             {
-                nextIndex = emptyIndex + 1; // 右へ
+                nextIndex = emptyIndex + 1;
             }
 
             SwapTilesInstant(nextIndex, emptyIndex);
@@ -196,12 +198,9 @@ public class SlidePuzzleBoard : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// タイルクリック処理
-    /// </summary>
     private void OnTileClicked(int clickedIndex)
     {
-        if (isCleared || isAnimating) return; // アニメーション中・クリア後は操作不可
+        if (isCleared || isAnimating) return;
 
         PuzzleManager manager = GetComponent<PuzzleManager>();
         if (manager != null && !manager.IsGameActive) return;
@@ -215,7 +214,6 @@ public class SlidePuzzleBoard : MonoBehaviour
 
         List<int> moveSequence = new List<int>();
 
-        // 同じ行（横方向）
         if (clickedRow == emptyRow)
         {
             int step = (clickedCol < emptyCol) ? -1 : 1;
@@ -224,7 +222,6 @@ public class SlidePuzzleBoard : MonoBehaviour
                 moveSequence.Add(emptyRow * gridSize + (col + step));
             }
         }
-        // 同じ列（縦方向）
         else if (clickedCol == emptyCol)
         {
             int step = (clickedRow < emptyRow) ? -1 : 1;
@@ -240,9 +237,6 @@ public class SlidePuzzleBoard : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 複数マスを連続で一括スライドさせるアニメーションコルーチン
-    /// </summary>
     private IEnumerator AnimateSlideSequence(List<int> moveSequence)
     {
         isAnimating = true;
@@ -251,7 +245,6 @@ public class SlidePuzzleBoard : MonoBehaviour
         {
             int targetTileIndex = moveSequence[i];
             
-            // 現在の空きマスの座標を取得
             Vector2 targetPos = tileRects[emptyIndex].anchoredPosition;
             Vector2 startPos = tileRects[targetTileIndex].anchoredPosition;
 
@@ -264,7 +257,6 @@ public class SlidePuzzleBoard : MonoBehaviour
                 yield return null;
             }
 
-            // 移動完了後、位置を元に戻してSpriteとColorのデータを差し替え
             tileRects[targetTileIndex].anchoredPosition = startPos;
             SwapTilesInstant(targetTileIndex, emptyIndex);
             emptyIndex = targetTileIndex;
@@ -280,22 +272,16 @@ public class SlidePuzzleBoard : MonoBehaviour
         isAnimating = false;
     }
 
-    /// <summary>
-    /// 2つのマスの「表示情報（Sprite・アルファ値）」と「内部データ」を即座に入れ替える
-    /// </summary>
     private void SwapTilesInstant(int index1, int index2)
     {
-        // 1. 内部IDの入れ替え
         int tempState = boardState[index1];
         boardState[index1] = boardState[index2];
         boardState[index2] = tempState;
 
-        // 2. Sprite（画像）の入れ替え
         Sprite tempSprite = tileImages[index1].sprite;
         tileImages[index1].sprite = tileImages[index2].sprite;
         tileImages[index2].sprite = tempSprite;
 
-        // 3. 透明度（Color）の入れ替え
         Color tempColor = tileImages[index1].color;
         tileImages[index1].color = tileImages[index2].color;
         tileImages[index2].color = tempColor;
@@ -307,17 +293,14 @@ public class SlidePuzzleBoard : MonoBehaviour
         int row = centerIndex / gridSize;
         int col = centerIndex % gridSize;
 
-        if (row > 0) neighbors.Add(centerIndex - gridSize);             // 上
-        if (row < gridSize - 1) neighbors.Add(centerIndex + gridSize); // 下
-        if (col > 0) neighbors.Add(centerIndex - 1);                   // 左
-        if (col < gridSize - 1) neighbors.Add(centerIndex + 1);       // 右
+        if (row > 0) neighbors.Add(centerIndex - gridSize);
+        if (row < gridSize - 1) neighbors.Add(centerIndex + gridSize);
+        if (col > 0) neighbors.Add(centerIndex - 1);
+        if (col < gridSize - 1) neighbors.Add(centerIndex + 1);
 
         return neighbors;
     }
 
-    /// <summary>
-    /// クリア判定
-    /// </summary>
     public bool CheckIsCleared()
     {
         for (int i = 0; i < boardState.Length; i++)
@@ -327,24 +310,17 @@ public class SlidePuzzleBoard : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// クリア時処理
-    /// </summary>
     private void OnClear()
     {
         isCleared = true;
-
-        // 透明にしていた空きマスを不透明に戻す
         tileImages[emptyIndex].color = new Color(1f, 1f, 1f, 1f);
 
-        // クリアメッセージの表示
         if (clearMessageText != null)
         {
             clearMessageText.text = "CLEAR!!";
             clearMessageText.gameObject.SetActive(true);
         }
 
-        //★ PuzzleManagerにクリアを通知してタイマーをストップさせる
         PuzzleManager manager = GetComponent<PuzzleManager>();
         if (manager != null)
         {

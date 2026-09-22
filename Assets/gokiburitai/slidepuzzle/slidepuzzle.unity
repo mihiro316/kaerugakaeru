@@ -496,7 +496,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: b38a5151b50f050418b709b8c4334a3e, type: 3}
+  m_Resource: {fileID: 8300000, guid: e553835ec4d9e8949b15ba794b022327, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.403
   m_Pitch: 1
@@ -1578,62 +1578,62 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleManager
   levelDataList:
   - levelNumber: 1
-    levelTexture: {fileID: 2800000, guid: e7dd2641881ee154089c23dc6c6ab00f, type: 3}
+    levelTexture: {fileID: 2800000, guid: d0aa9fdf08df6b043bfe93a92fa4d80e, type: 3}
     gridSize: 3
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 2
-    levelTexture: {fileID: 2800000, guid: 3e13bee8c6929b04a8fa59a18a8eb674, type: 3}
+    levelTexture: {fileID: 2800000, guid: 178dcebe0dfc26948a1aeba354f35f36, type: 3}
     gridSize: 3
     maxMoves: 120
     timeLimit: 60
   - levelNumber: 3
-    levelTexture: {fileID: 2800000, guid: c15ec2cfc75f3fe498c1b29664360635, type: 3}
+    levelTexture: {fileID: 2800000, guid: e503446c89463564bbcaa0b314f0ecb4, type: 3}
     gridSize: 3
     maxMoves: 90
     timeLimit: 40
   - levelNumber: 4
-    levelTexture: {fileID: 2800000, guid: e7dd2641881ee154089c23dc6c6ab00f, type: 3}
+    levelTexture: {fileID: 2800000, guid: ff5e22ccc9748b14a8b6bc320a149ea1, type: 3}
     gridSize: 3
     maxMoves: 40
     timeLimit: 30
   - levelNumber: 5
-    levelTexture: {fileID: 2800000, guid: 3e13bee8c6929b04a8fa59a18a8eb674, type: 3}
+    levelTexture: {fileID: 2800000, guid: d0aa9fdf08df6b043bfe93a92fa4d80e, type: 3}
     gridSize: 4
     maxMoves: 300
     timeLimit: 150
   - levelNumber: 6
-    levelTexture: {fileID: 2800000, guid: c15ec2cfc75f3fe498c1b29664360635, type: 3}
+    levelTexture: {fileID: 2800000, guid: 178dcebe0dfc26948a1aeba354f35f36, type: 3}
     gridSize: 4
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 7
-    levelTexture: {fileID: 2800000, guid: e7dd2641881ee154089c23dc6c6ab00f, type: 3}
+    levelTexture: {fileID: 2800000, guid: e503446c89463564bbcaa0b314f0ecb4, type: 3}
     gridSize: 4
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 8
-    levelTexture: {fileID: 2800000, guid: 3e13bee8c6929b04a8fa59a18a8eb674, type: 3}
+    levelTexture: {fileID: 2800000, guid: ff5e22ccc9748b14a8b6bc320a149ea1, type: 3}
     gridSize: 4
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 9
-    levelTexture: {fileID: 2800000, guid: c15ec2cfc75f3fe498c1b29664360635, type: 3}
+    levelTexture: {fileID: 2800000, guid: d0aa9fdf08df6b043bfe93a92fa4d80e, type: 3}
     gridSize: 5
     maxMoves: 500
     timeLimit: 300
   - levelNumber: 10
-    levelTexture: {fileID: 2800000, guid: e7dd2641881ee154089c23dc6c6ab00f, type: 3}
+    levelTexture: {fileID: 2800000, guid: 178dcebe0dfc26948a1aeba354f35f36, type: 3}
     gridSize: 5
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 11
-    levelTexture: {fileID: 2800000, guid: 3e13bee8c6929b04a8fa59a18a8eb674, type: 3}
+    levelTexture: {fileID: 2800000, guid: e503446c89463564bbcaa0b314f0ecb4, type: 3}
     gridSize: 5
     maxMoves: 200
     timeLimit: 150
   - levelNumber: 12
-    levelTexture: {fileID: 2800000, guid: c15ec2cfc75f3fe498c1b29664360635, type: 3}
+    levelTexture: {fileID: 2800000, guid: ff5e22ccc9748b14a8b6bc320a149ea1, type: 3}
     gridSize: 5
     maxMoves: 250
     timeLimit: 150
