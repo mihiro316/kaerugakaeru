@@ -1,26 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.UI;
+
+// レベル単位の設定構造体
+[System.Serializable]
+public struct LevelData
+{
+    [Tooltip("レベル番号（1～12）")]
+    public int levelNumber;
+    [Tooltip("このレベルで使用するパズル画像")]
+    public Texture2D levelTexture;
+    [Tooltip("分割数（例: 3なら3x3, 4なら4x4）")]
+    public int gridSize;
+    [Tooltip("制限手数")]
+    public int maxMoves;
+    [Tooltip("制限時間（秒数。0で制限時間なし）")]
+    public float timeLimit;
+}
 
 public class PuzzleManager : MonoBehaviour
 {
-    // レベル単位の設定構造体
-    [System.Serializable]
-    public struct LevelData
-    {
-        [Tooltip("レベル番号（1～12）")]
-        public int levelNumber;
-        [Tooltip("このレベルで使用するパズル画像")]
-        public Texture2D levelTexture;
-        [Tooltip("分割数（例: 3なら3x3, 4なら4x4）")]
-        public int gridSize;
-        [Tooltip("制限手数")]
-        public int maxMoves;
-        [Tooltip("制限時間（秒数。0で制限時間なし）")]
-        public float timeLimit;
-    }
-
     [Header("レベル設定 (1～12)")]
     public List<LevelData> levelDataList = new List<LevelData>();
 
@@ -30,39 +30,61 @@ public class PuzzleManager : MonoBehaviour
     [Tooltip("ゲームプレイ画面の親オブジェクトまたはCanvas")]
     public GameObject gamePlayPanel;
 
-    [Header("UI表示コンポーネント")]
+    [Header("UI表示コンポーネント（ゲーム中）")]
     public TextMeshProUGUI moveCountText;
     public TextMeshProUGUI timerText;
-    public TextMeshProUGUI levelTitleText; // 「Level 1」などの表示用（任意）
+    public TextMeshProUGUI levelTitleText;
+
+    [Header("①・② リザルト画面UI（クリア/ゲームオーバー兼用）")]
+    [Tooltip("結果を表示するパネル")]
+    public GameObject resultPanel;
+    [Tooltip("「GAME CLEAR!」や「GAME OVER...」を表示")]
+    public TextMeshProUGUI resultTitleText;
+    [Tooltip("クリア／終了時の時間を表示")]
+    public TextMeshProUGUI resultTimeText;
+    [Tooltip("クリア／終了時の手数を表示")]
+    public TextMeshProUGUI resultMoveText;
+
+    [Header("★ リザルト時に非表示にしたいオブジェクト")]
+    [Tooltip("リザルト画面表示時に非表示にしたいオブジェクト（タイマーや残り手数UI、またはゲーム盤面など）")]
+    public List<GameObject> hideObjectsOnResult = new List<GameObject>();
 
     [Header("参照")]
     public SlidePuzzleBoard puzzleBoard;
 
     private LevelData currentLevelData;
     private int remainingMoves;
+    private int moveCount = 0;       // 実際に動かした手数
     private float currentTimer;
+    private float elapsedTime = 0f;  // 実際にかかった時間
     private float activeTimeLimit;
     private bool isGameActive = false;
 
+    // SlidePuzzleBoard側から状態を確認するためのプロパティ
     public bool IsGameActive => isGameActive;
 
     private void Start()
     {
-        // レベル選択画面で保存されたレベル番号を取得してパズルを開始する
-        int levelToStart = PuzzleGameManager.SelectedLevel;
+        if (resultPanel != null) resultPanel.SetActive(false);
 
-        // もし値がセットされていない場合の安全対策（デフォルト1にする）
-        if (levelToStart <= 0) levelToStart = 1;
-    
-        // 取得したレベル番号でパズルを開始！
-        StartLevel(levelToStart);
+        // PuzzleGameManager で保存されているレベル番号を参照します
+        if (PuzzleGameManager.SelectedLevel > 0)
+        {
+            StartLevel(PuzzleGameManager.SelectedLevel);
+        }
+        else
+        {
+            ShowLevelSelectScreen();
+        }
     }
 
     private void Update()
     {
         if (!isGameActive) return;
 
-        // 制限時間の更新
+        // 経過時間と残り時間の計算
+        elapsedTime += Time.deltaTime;
+
         if (activeTimeLimit > 0f)
         {
             currentTimer -= Time.deltaTime;
@@ -70,7 +92,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 currentTimer = 0f;
                 UpdateTimerUI();
-                OnGameOver("TIME OVER");
+                OnGameOver("時間切れ！");
                 return;
             }
         }
@@ -82,26 +104,19 @@ public class PuzzleManager : MonoBehaviour
         UpdateTimerUI();
     }
 
-    /// <summary>
-    /// レベル選択画面を表示する
-    /// </summary>
     public void ShowLevelSelectScreen()
     {
         isGameActive = false;
 
         if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
         if (gamePlayPanel != null) gamePlayPanel.SetActive(false);
+        if (resultPanel != null) resultPanel.SetActive(false);
     }
 
-    /// <summary>
-    /// レベル番号を指定してゲームを開始（ボタンのOnClickから呼び出す）
-    /// </summary>
     public void StartLevel(int levelNumber)
     {
-        // 該当するレベルのデータを検索
         LevelData data = levelDataList.Find(l => l.levelNumber == levelNumber);
 
-        // データが見つからない場合のフォールバック（画像が未設定の場合は警告）
         if (data.levelTexture == null)
         {
             Debug.LogError($"レベル {levelNumber} の画像(Texture2D)が設定されていません！ Inspectorを確認してください。");
@@ -110,12 +125,20 @@ public class PuzzleManager : MonoBehaviour
 
         currentLevelData = data;
         remainingMoves = data.maxMoves;
+        moveCount = 0;
+        elapsedTime = 0f;
         activeTimeLimit = data.timeLimit;
         currentTimer = (activeTimeLimit > 0f) ? activeTimeLimit : 0f;
 
-        // 画面の切り替え
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
         if (gamePlayPanel != null) gamePlayPanel.SetActive(true);
+        if (resultPanel != null) resultPanel.SetActive(false);
+
+        // ★ リスタート時などに隠していたオブジェクトを再表示する
+        foreach (GameObject obj in hideObjectsOnResult)
+        {
+            if (obj != null) obj.SetActive(true);
+        }
 
         if (levelTitleText != null)
         {
@@ -127,7 +150,6 @@ public class PuzzleManager : MonoBehaviour
         UpdateMoveCountUI();
         UpdateTimerUI();
 
-        // 指定画像とサイズでパズルを初期化
         if (puzzleBoard != null)
         {
             puzzleBoard.sourceTexture = data.levelTexture;
@@ -136,51 +158,76 @@ public class PuzzleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 現在選択中のレベルをリスタート（リトライボタン用）
-    /// </summary>
-    public void RestartCurrentLevel()
-    {
-        StartLevel(currentLevelData.levelNumber);
-    }
-
-    /// <summary>
-    /// ピース移動時のカウントダウン処理
+    /// ピース移動時にSlidePuzzleBoardから呼び出されます
     /// </summary>
     public void OnPieceMoved()
     {
         if (!isGameActive) return;
 
+        moveCount++;
         remainingMoves--;
         UpdateMoveCountUI();
 
-        if (remainingMoves <= 0)
+        if (remainingMoves <= 0 && activeTimeLimit > 0f)
         {
-            OnGameOver("GAME OVER");
+            OnGameOver("手数オーバー！");
         }
     }
 
     /// <summary>
-    /// クリア時処理
+    /// クリア時にSlidePuzzleBoardから呼び出されます
     /// </summary>
     public void OnClear()
     {
+        if (!isGameActive) return;
         isGameActive = false;
+
+        ShowResult("GAME CLEAR!!", Color.white);
     }
 
     /// <summary>
     /// ゲームオーバー処理
     /// </summary>
-    private void OnGameOver(string message)
+    public void OnGameOver(string reason)
     {
+        if (!isGameActive) return;
         isGameActive = false;
 
-        if (puzzleBoard != null && puzzleBoard.clearMessageText != null)
+        ShowResult($"GAME OVER", Color.red);
+    }
+
+    /// <summary>
+    /// リザルト画面（パネル）の表示処理
+    /// </summary>
+    private void ShowResult(string title, Color titleColor)
+    {
+        // ★ 指定されたオブジェクトを非表示（SetActive(false)）にする
+        foreach (GameObject obj in hideObjectsOnResult)
         {
-            puzzleBoard.clearMessageText.text = message;
-            puzzleBoard.clearMessageText.gameObject.SetActive(true);
+            if (obj != null) obj.SetActive(false);
         }
 
-        Debug.Log($"ゲームオーバー: {message}");
+        if (resultPanel == null) return;
+
+        if (resultTitleText != null)
+        {
+            resultTitleText.text = title;
+            resultTitleText.color = titleColor;
+        }
+
+        if (resultTimeText != null)
+        {
+            int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+            int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+            resultTimeText.text = $"タイム: {minutes:00}:{seconds:00}";
+        }
+
+        if (resultMoveText != null)
+        {
+            resultMoveText.text = $"手数: {moveCount} 回";
+        }
+
+        resultPanel.SetActive(true);
     }
 
     private void UpdateMoveCountUI()
@@ -198,30 +245,9 @@ public class PuzzleManager : MonoBehaviour
             int minutes = Mathf.FloorToInt(currentTimer / 60f);
             int seconds = Mathf.FloorToInt(currentTimer % 60f);
 
-            string label = (activeTimeLimit > 0f) ? "" : "時間";
-            timerText.text = $"{label} {minutes:00}:{seconds:00}";
+            string label = (activeTimeLimit > 0f) ? "残り時間" : "時間";
+            timerText.text = $" {minutes:00}:{seconds:00}";
         }
     }
-    [Header("UI表示コンポーネント")]
-    public Image levelPreviewImage; // ★追加：レベル選択画面のプレビュー表示用Image
 
-    /// <summary>
-    /// レベルボタンがホバーされた時やクリックされた時にプレビュー画像を表示する
-    /// </summary>
-    public void ShowLevelPreview(int levelNumber)
-    {
-        LevelData data = levelDataList.Find(l => l.levelNumber == levelNumber); //
-        if (data.levelTexture != null && levelPreviewImage != null)
-        {
-            // Texture2D から Sprite を作成してアタッチ
-            Sprite previewSprite = Sprite.Create(
-                data.levelTexture,
-                new Rect(0, 0, data.levelTexture.width, data.levelTexture.height),
-                new Vector2(0.5f, 0.5f)
-            );
-            
-            levelPreviewImage.sprite = previewSprite;
-            levelPreviewImage.gameObject.SetActive(true);
-        }
-    }
 }

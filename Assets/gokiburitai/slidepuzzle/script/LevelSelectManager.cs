@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // シーン切り替え用[cite: 1]
+using UnityEngine.SceneManagement; // シーン切り替え用
 
 public class LevelSelectManager : MonoBehaviour
 {
@@ -8,10 +8,20 @@ public class LevelSelectManager : MonoBehaviour
     /// </summary>
     public void SelectLevel(int levelNumber)
     {
-        // GameManager から PuzzleGameManager に変更
+        // SelectedLevel に選択したレベル番号を保持[cite: 6]
         PuzzleGameManager.SelectedLevel = levelNumber;
 
-        // パズル画面（slidepuzzle）へシーン遷移[cite: 1]
+        // パズル画面（slidepuzzle）へシーン遷移
+        SceneManager.LoadScene("slidepuzzle");
+    }
+
+    /// <summary>
+    /// 現在のレベルをもう一度最初からやり直す（リトライ/リスタート用）★追加
+    /// </summary>
+    public void Retry()
+    {
+        // PuzzleGameManager.SelectedLevel に直前のレベル番号が残っているため、
+        // そのまま slidepuzzle シーンを再読み込みすることでリトライになります[cite: 1]
         SceneManager.LoadScene("slidepuzzle");
     }
 
@@ -24,11 +34,10 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// レベル選択画面へ戻るボタン用（★こちらを追加）
+    /// レベル選択画面へ戻るボタン用
     /// </summary>
     public void BackToLevelSelect()
     {
-        // 遷移先のレベル選択シーン名を指定（例: "LevelSelect"）
-        SceneManager.LoadScene("LevelSelect"); 
+        SceneManager.LoadScene("levelselect"); 
     }
 }

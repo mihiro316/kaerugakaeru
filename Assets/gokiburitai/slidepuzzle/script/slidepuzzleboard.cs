@@ -310,28 +310,41 @@ public class SlidePuzzleBoard : MonoBehaviour
         return true;
     }
 
+ /// <summary>
+    /// クリア時処理
+    /// </summary>
     private void OnClear()
     {
         isCleared = true;
-        tileImages[emptyIndex].color = new Color(1f, 1f, 1f, 1f);
 
-        if (clearMessageText != null)
+        // 1. 透明にしていた右下の空きマスを不透明に戻して一枚絵を完成させる
+        if (tileImages != null && emptyIndex < tileImages.Length && tileImages[emptyIndex] != null)
         {
-            clearMessageText.text = "CLEAR!!";
-            clearMessageText.gameObject.SetActive(true);
+            tileImages[emptyIndex].color = new Color(1f, 1f, 1f, 1f);
         }
 
+        // 2. 独自のメッセージ表示は非表示（PuzzleManager側のResultPanelに任せる）
+        if (clearMessageText != null)
+        {
+            clearMessageText.gameObject.SetActive(false);
+        }
+
+        // 3. PuzzleManagerへクリア通知（ここでタイマー停止＆リザルトパネル表示が行われます）
         PuzzleManager manager = GetComponent<PuzzleManager>();
         if (manager != null)
         {
             manager.OnClear();
         }
 
-        Debug.Log("クリアしました！");
+        Debug.Log("パズルが完成しました！");
     }
 
+    /// <summary>
+    /// ピース移動時の処理
+    /// </summary>
     private void OnPieceMoved()
     {
+        // PuzzleManagerへ手数の加算・制限チェックを通知
         PuzzleManager manager = GetComponent<PuzzleManager>();
         if (manager != null)
         {
