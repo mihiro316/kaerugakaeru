@@ -187,7 +187,7 @@ public class PuzzleManager : MonoBehaviour
     {
         if (moveCountText != null)
         {
-            moveCountText.text = $"残り手数: {remainingMoves}";
+            moveCountText.text = $" {remainingMoves}";
         }
     }
 
@@ -198,8 +198,8 @@ public class PuzzleManager : MonoBehaviour
             int minutes = Mathf.FloorToInt(currentTimer / 60f);
             int seconds = Mathf.FloorToInt(currentTimer % 60f);
 
-            string label = (activeTimeLimit > 0f) ? "残り時間" : "時間";
-            timerText.text = $"{label}: {minutes:00}:{seconds:00}";
+            string label = (activeTimeLimit > 0f) ? "" : "時間";
+            timerText.text = $"{label} {minutes:00}:{seconds:00}";
         }
     }
     [Header("UI表示コンポーネント")]
