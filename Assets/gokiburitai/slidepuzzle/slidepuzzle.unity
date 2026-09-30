@@ -2461,18 +2461,18 @@ MonoBehaviour:
   - levelNumber: 5
     levelTexture: {fileID: 2800000, guid: d0aa9fdf08df6b043bfe93a92fa4d80e, type: 3}
     gridSize: 4
-    maxMoves: 300
-    timeLimit: 150
+    maxMoves: 1200
+    timeLimit: 600
   - levelNumber: 6
     levelTexture: {fileID: 2800000, guid: 178dcebe0dfc26948a1aeba354f35f36, type: 3}
     gridSize: 4
-    maxMoves: 200
-    timeLimit: 150
+    maxMoves: 800
+    timeLimit: 420
   - levelNumber: 7
     levelTexture: {fileID: 2800000, guid: e503446c89463564bbcaa0b314f0ecb4, type: 3}
     gridSize: 4
-    maxMoves: 200
-    timeLimit: 150
+    maxMoves: 400
+    timeLimit: 240
   - levelNumber: 8
     levelTexture: {fileID: 2800000, guid: ff5e22ccc9748b14a8b6bc320a149ea1, type: 3}
     gridSize: 4
@@ -2481,18 +2481,18 @@ MonoBehaviour:
   - levelNumber: 9
     levelTexture: {fileID: 2800000, guid: d0aa9fdf08df6b043bfe93a92fa4d80e, type: 3}
     gridSize: 5
-    maxMoves: 500
+    maxMoves: 600
     timeLimit: 300
   - levelNumber: 10
     levelTexture: {fileID: 2800000, guid: 178dcebe0dfc26948a1aeba354f35f36, type: 3}
     gridSize: 5
-    maxMoves: 200
-    timeLimit: 150
+    maxMoves: 500
+    timeLimit: 240
   - levelNumber: 11
     levelTexture: {fileID: 2800000, guid: e503446c89463564bbcaa0b314f0ecb4, type: 3}
     gridSize: 5
-    maxMoves: 200
-    timeLimit: 150
+    maxMoves: 400
+    timeLimit: 210
   - levelNumber: 12
     levelTexture: {fileID: 2800000, guid: ff5e22ccc9748b14a8b6bc320a149ea1, type: 3}
     gridSize: 5
