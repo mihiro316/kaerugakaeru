@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]private AudioClip goodSe;
     [SerializeField]private AudioClip badSe;
 
+    private int foodsCount = -1;     //料理数
+    [SerializeField] int allFoods;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -44,8 +47,16 @@ public class GameManager : MonoBehaviour
 
     public void Change()
     {
-        int n = Random.Range(0,foods.Count);
-        ChangeFood(n);
-        ChangeMenue(n);
+        foodsCount ++;
+        if (foodsCount < allFoods)  //料理がまだあるなら
+        {
+            int n = Random.Range(0,foods.Count);
+            ChangeFood(n);
+            ChangeMenue(n);
+        }
+        else
+        {
+            Destroy(nowFood);
+        }
     }
 }
