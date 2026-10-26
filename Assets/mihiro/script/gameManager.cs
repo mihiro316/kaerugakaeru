@@ -15,14 +15,17 @@ public class GameManager : MonoBehaviour
     [SerializeField]private AudioClip goodSe;
     [SerializeField]private AudioClip badSe;
 
-    private int foodsCount = -1;     //料理数
-    [SerializeField] int allFoods;
+    private int foodsCount = -1;     //出てきた料理数
+    [SerializeField] int allFoods;  //出てくる料理数
+    private float clearTime;     //クリア時間
+    [SerializeField] List<float> scoreTime; //クリアタイムのスコアの閾値
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         menueSr = menue.GetComponent<SpriteRenderer>();
         gameManagerSc = GetComponent<GameManager>();
+        clearTime = Time.time;
         Change();
     }
 
@@ -57,6 +60,8 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(nowFood);
+            clearTime = Time.time - clearTime;
+            Debug.Log(clearTime);
         }
     }
 }

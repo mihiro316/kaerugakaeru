@@ -193,6 +193,7 @@ MonoBehaviour:
   good: {fileID: 6132487687171432967, guid: 864070262d7bd4b208e2c4651fb2497c, type: 3}
   goodSe: {fileID: 8300000, guid: 16e807e401d394a06a7565c6c564c505, type: 3}
   badSe: {fileID: 8300000, guid: 8a880fb15566d47068c62ba2aa274def, type: 3}
+  allFoods: 10
 --- !u!4 &296106585
 Transform:
   m_ObjectHideFlags: 0
