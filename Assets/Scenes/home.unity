@@ -296,7 +296,7 @@ MonoBehaviour:
   sceneNames:
   - mihiro
   - syunpei
-  - 
+  - title
 --- !u!1 &1688089954
 GameObject:
   m_ObjectHideFlags: 0
