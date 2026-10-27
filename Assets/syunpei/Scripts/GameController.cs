@@ -79,6 +79,11 @@ public class GameController : MonoBehaviour
     [SerializeField] private TMP_Text travelledDistanceText;
     [SerializeField] private TMP_Text trainInformationText;
 
+    [SerializeField] private TMP_Text platformNumberText;
+    [SerializeField] private TMP_Text stationNumberText;
+    [SerializeField] private TMP_Text trainStatusText;
+    [SerializeField] private GameObject trainStatusTextBox;
+
     [Header("Result UI")]
     [SerializeField] private TMP_Text resultStatusText;
     [SerializeField] private TMP_Text rankText;
@@ -731,6 +736,60 @@ public class GameController : MonoBehaviour
             trainInformationText.text = $"Train {ridingTrainId}\n{(ridingTrainIsStopped ? "Stopped" : "Running")}\n{destination}";
         }
         if (playerState == PlayerState.AtStation) UpdateStationVisuals();
+
+        if (platformNumberText != null)
+        {
+        if (playerState == PlayerState.AtStation)
+            {
+                platformNumberText.text = $"{selectedPlatformNumber}";
+            }
+            else if (ridingTrainIsStopped)
+            {
+                platformNumberText.text = $"{ridingTrainPlatform}";
+            }
+            else
+            {
+                platformNumberText.text = "";
+            }
+        }
+
+        if (stationNumberText != null)
+        {
+            if (playerState == PlayerState.AtStation)
+            {
+                stationNumberText.text = $"{currentStation}";
+            }
+            else
+            {
+                stationNumberText.text = $"{ridingTrainStation}";
+            }
+        }
+
+        if (trainStatusText != null)
+        {
+            if (playerState == PlayerState.InTrain)
+            {
+                trainStatusTextBox.gameObject.SetActive(true);
+
+                if (ridingTrainIsStopped)
+                {
+                    trainStatusText.text = "停車中";
+                }
+                else
+                {
+                    trainStatusText.text = "走行中";
+                }
+            }
+            else
+            {
+                trainStatusTextBox.gameObject.SetActive(false);
+            }
+        }
+
+        if (goalStationText != null)
+        {
+            goalStationText.text = $"{goalStation}";
+        }
     }
 
     private int GetNextDestination(TrainState train)
