@@ -146,7 +146,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         StartBgm();
-        ApplyGameModeImmediately(GameMode.Title);
+        ApplyGameModeImmediately(GameMode.Game);
     }
 
     private void Update()
