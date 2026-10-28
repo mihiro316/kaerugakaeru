@@ -11,8 +11,8 @@ public class GameController : MonoBehaviour
 {
     private const int StationCount = 30;
     private const int Infinity = 1_000_000_000;
-    private const float IntermediateStopSeconds = 5f;
-    private const float TerminalStopSeconds = 10f;
+    private const float IntermediateStopSeconds = 2f;
+    private const float TerminalStopSeconds = 2f;
 
     public enum GameMode { Title, Game, Result }
     private enum PlayerState { AtStation, InTrain }
@@ -121,6 +121,9 @@ public class GameController : MonoBehaviour
     private readonly Dictionary<int, PlatformKey> trainStopPositions = new Dictionary<int, PlatformKey>();
     private readonly Dictionary<int, TrainState> trains = new Dictionary<int, TrainState>();
     private readonly Dictionary<EdgeLaneKey, int> occupiedTracks = new Dictionary<EdgeLaneKey, int>();
+/////////////////////////////////
+    private readonly Dictionary<PlatformKey, int> reservedPlatforms = new Dictionary<PlatformKey, int>();
+/////////////////////////////////
     private readonly List<MoveRequest> moveRequests = new List<MoveRequest>();
     private readonly List<int> sortedTrainIds = new List<int>();
 
@@ -436,7 +439,8 @@ public class GameController : MonoBehaviour
         int trainId = 1;
         for (int routeId = 0; routeId < routes.Length; routeId++)
         {
-            int trainCount = routeId == 4 ? 4 : 2;
+            // int trainCount = routeId == 4 ? 4 : 2;
+            int trainCount = 2;
             for (int index = 0; index < trainCount; index++)
             {
                 bool first = index % 2 == 0;
@@ -460,6 +464,10 @@ public class GameController : MonoBehaviour
     {
         trains.Clear(); sortedTrainIds.Clear(); stoppedTrains.Clear(); trainStopPositions.Clear();
         occupiedTracks.Clear(); moveRequests.Clear();
+
+        //////////////////////////
+        reservedPlatforms.Clear();
+        //////////////////////////
     }
 
     private void UpdateTrains(float deltaTime)
@@ -511,44 +519,169 @@ public class GameController : MonoBehaviour
 
     private void ProcessMoveRequests()
     {
-        moveRequests.Sort((a, b) => a.Sequence.CompareTo(b.Sequence));
-        bool moved;
-        do
+        // moveRequests.Sort((a, b) => a.Sequence.CompareTo(b.Sequence));
+        // bool moved;
+        // do
+        // {
+//             moved = false;
+//             for (int i = 0; i < moveRequests.Count; i++)
+//             {
+//                 MoveRequest request = moveRequests[i];
+//                 if (!trains.TryGetValue(request.TrainId, out TrainState train)) { moveRequests.RemoveAt(i--); continue; }
+//                 int destinationPlatform = FindAvailablePlatform(request.ToStation, train.RouteId, train.Direction);
+//                 EdgeLaneKey track = GetRequiredTrack(request.FromStation, request.ToStation);
+//                 // if (destinationPlatform < 1 || occupiedTracks.ContainsKey(track)) continue;////////////
+//                 occupiedTracks[track] = train.TrainId;
+//                 PlatformKey destinationKey = new PlatformKey(request.ToStation, destinationPlatform);
+//                 //stoppedTrains[destinationKey] = train.TrainId;////////////////
+//                 reservedPlatforms[destinationKey] = train.TrainId;
+// /////////////
+//                 ReleaseCurrentPlatform(train);
+
+//                 train.ReservedPlatform = destinationPlatform;
+//                 train.RunningTrack = track;
+//                 train.NextStation = request.ToStation;
+//                 train.NextRouteIndex = request.NextRouteIndex;
+//                 train.State = TrainMotionState.Running;
+//                 train.RemainingSeconds = GetEdgeDistance(request.FromStation, request.ToStation);
+
+//                 if (ridingTrainId == train.TrainId)
+//                 {
+//                     ridingTrainIsStopped = false;
+//                     ridingTrainStation = -1;
+//                     ridingTrainPlatform = -1;
+//                     SetMessage("The train is running to the next station.");
+//                 }
+//                 if (logTrainEvents) Debug.Log($"Train {train.TrainId} departed Station {request.FromStation} for Station {request.ToStation}.");
+//                 moveRequests.RemoveAt(i);
+//                 moved = true;
+//                 break;
+//             }
+//         } while (moved);
+    moveRequests.Sort(
+        (a, b) => a.Sequence.CompareTo(b.Sequence)
+    );
+
+    bool moved;
+
+    do
+    {
+        moved = false;
+
+        for (int i = 0; i < moveRequests.Count; i++)
         {
-            moved = false;
-            for (int i = 0; i < moveRequests.Count; i++)
+            MoveRequest request = moveRequests[i];
+
+            TrainState train;
+
+            if (!trains.TryGetValue(request.TrainId, out train))
             {
-                MoveRequest request = moveRequests[i];
-                if (!trains.TryGetValue(request.TrainId, out TrainState train)) { moveRequests.RemoveAt(i--); continue; }
-                int destinationPlatform = FindAvailablePlatform(request.ToStation, train.RouteId, train.Direction);
-                EdgeLaneKey track = GetRequiredTrack(request.FromStation, request.ToStation);
-                if (destinationPlatform < 1 || occupiedTracks.ContainsKey(track)) continue;
-
-                occupiedTracks[track] = train.TrainId;
-                PlatformKey destinationKey = new PlatformKey(request.ToStation, destinationPlatform);
-                stoppedTrains[destinationKey] = train.TrainId;
-                ReleaseCurrentPlatform(train);
-
-                train.ReservedPlatform = destinationPlatform;
-                train.RunningTrack = track;
-                train.NextStation = request.ToStation;
-                train.NextRouteIndex = request.NextRouteIndex;
-                train.State = TrainMotionState.Running;
-                train.RemainingSeconds = GetEdgeDistance(request.FromStation, request.ToStation);
-
-                if (ridingTrainId == train.TrainId)
-                {
-                    ridingTrainIsStopped = false;
-                    ridingTrainStation = -1;
-                    ridingTrainPlatform = -1;
-                    SetMessage("The train is running to the next station.");
-                }
-                if (logTrainEvents) Debug.Log($"Train {train.TrainId} departed Station {request.FromStation} for Station {request.ToStation}.");
                 moveRequests.RemoveAt(i);
-                moved = true;
-                break;
+                i--;
+                continue;
             }
-        } while (moved);
+
+            int destinationPlatform = FindAvailablePlatform(
+                request.ToStation,
+                train.RouteId,
+                train.Direction
+            );
+
+            EdgeLaneKey track = GetRequiredTrack(
+                request.FromStation,
+                request.ToStation
+            );
+
+            if (destinationPlatform < 1)
+            {
+                if (request.FromStation == 9 ||
+                    request.FromStation == 12)
+                {
+                    Debug.Log(
+                        "駅" + request.FromStation +
+                        "の電車" + train.TrainId +
+                        "は、駅" + request.ToStation +
+                        "のホームが空いていないため発車できません"
+                    );
+                }
+
+                continue;
+            }
+
+            if (occupiedTracks.ContainsKey(track))
+            {
+                if (request.FromStation == 9 ||
+                    request.FromStation == 12)
+                {
+                    int blockingTrainId =
+                        occupiedTracks[track];
+
+                    Debug.Log(
+                        "駅" + request.FromStation +
+                        "の電車" + train.TrainId +
+                        "は、駅" + request.ToStation +
+                        "までの線路を電車" +
+                        blockingTrainId +
+                        "が使用しているため発車できません"
+                    );
+                }
+
+                continue;
+            }
+
+            occupiedTracks[track] = train.TrainId;
+
+            PlatformKey destinationKey =
+                new PlatformKey(
+                    request.ToStation,
+                    destinationPlatform
+                );
+
+            reservedPlatforms[destinationKey] =
+                train.TrainId;
+
+            ReleaseCurrentPlatform(train);
+
+            train.ReservedPlatform = destinationPlatform;
+            train.RunningTrack = track;
+            train.NextStation = request.ToStation;
+            train.NextRouteIndex = request.NextRouteIndex;
+            train.State = TrainMotionState.Running;
+
+            train.RemainingSeconds = GetEdgeDistance(
+                request.FromStation,
+                request.ToStation
+            );
+
+            if (ridingTrainId == train.TrainId)
+            {
+                ridingTrainIsStopped = false;
+                ridingTrainStation = -1;
+                ridingTrainPlatform = -1;
+
+                SetMessage(
+                    "The train is running to the next station."
+                );
+            }
+
+            if (logTrainEvents)
+            {
+                Debug.Log(
+                    "Train " + train.TrainId +
+                    " departed Station " +
+                    request.FromStation +
+                    " for Station " +
+                    request.ToStation + "."
+                );
+            }
+
+            moveRequests.RemoveAt(i);
+            moved = true;
+            break;
+        }
+    }
+    while (moved);
+
     }
 
     private void CompleteArrival(TrainState train)
@@ -562,9 +695,18 @@ public class GameController : MonoBehaviour
         train.State = TrainMotionState.Stopped;
         bool terminal = train.RouteIndex == 0 || train.RouteIndex == routes[train.RouteId].Length - 1;
         train.RemainingSeconds = terminal ? TerminalStopSeconds : IntermediateStopSeconds;
-        PlatformKey key = new PlatformKey(train.CurrentStation, train.CurrentPlatform);
-        trainStopPositions[train.TrainId] = key;
+        /////////////////////
+        PlatformKey key =
+    new PlatformKey(train.CurrentStation, train.CurrentPlatform);
 
+// 到着したため、予約を解除する
+reservedPlatforms.Remove(key);
+
+// 実際に停車中の電車として登録する
+stoppedTrains[key] = train.TrainId;
+
+trainStopPositions[train.TrainId] = key;
+        /////////////////////
         if (ridingTrainId == train.TrainId)
         {
             ridingTrainIsStopped = true;
@@ -589,17 +731,52 @@ public class GameController : MonoBehaviour
         if (playerState == PlayerState.AtStation && currentStation == train.CurrentStation) UpdateStationVisuals();
     }
 
-    private int FindAvailablePlatform(int station, int routeId, int direction)
+    // private int FindAvailablePlatform(int station, int routeId, int direction)
+    // {
+    //     int count = GetPlatformCount(station);
+    //     int preferred = GetPreferredPlatform(station, routeId, direction, count);
+    //     for (int offset = 0; offset < count; offset++)
+    //     {
+    //         int platform = ((preferred - 1 + offset) % count) + 1;
+    //         if (!stoppedTrains.ContainsKey(new PlatformKey(station, platform))) return platform;
+    //     }
+    //     return -1;
+    // }
+    private int FindAvailablePlatform(int station,int routeId,int direction)
     {
-        int count = GetPlatformCount(station);
-        int preferred = GetPreferredPlatform(station, routeId, direction, count);
-        for (int offset = 0; offset < count; offset++)
+    int count = GetPlatformCount(station);
+
+    int preferred = GetPreferredPlatform(
+        station,
+        routeId,
+        direction,
+        count
+    );
+
+    for (int offset = 0; offset < count; offset++)
+    {
+        int platform =
+            ((preferred - 1 + offset) % count) + 1;
+
+        PlatformKey platformKey =
+            new PlatformKey(station, platform);
+
+        bool stopped =
+            stoppedTrains.ContainsKey(platformKey);
+
+        bool reserved =
+            reservedPlatforms.ContainsKey(platformKey);
+
+        if (!stopped && !reserved)
         {
-            int platform = ((preferred - 1 + offset) % count) + 1;
-            if (!stoppedTrains.ContainsKey(new PlatformKey(station, platform))) return platform;
+            return platform;
         }
-        return -1;
     }
+
+    return -1;
+}
+
+    /////////////////////////////////////////
 
     private int GetPreferredPlatform(int station, int routeId, int direction, int platformCount)
     {
@@ -645,7 +822,7 @@ public class GameController : MonoBehaviour
             {11,12},{12,13},{12,26},{13,14},{14,15},{14,16},{14,18},{14,21},{16,17},{18,19},{19,20},
             {21,22},{22,23},{23,24},{24,25},{25,29},{27,28},{28,29},{29,30}
         };
-        for (int i = 0; i < edges.GetLength(0); i++) AddUndirectedEdge(edges[i, 0], edges[i, 1], UnityEngine.Random.Range(4, 7));
+        for (int i = 0; i < edges.GetLength(0); i++) AddUndirectedEdge(edges[i, 0], edges[i, 1], UnityEngine.Random.Range(1, 2));
     }
 
     private void AddUndirectedEdge(int aStation, int bStation, int distance)
@@ -818,6 +995,60 @@ public class GameController : MonoBehaviour
             SetMessage($"Train {trainId} bound for Station {GetNextDestination(train)} is stopped at Platform {selectedPlatformNumber}. Press Up or W to board.");
         else SetMessage($"No train is currently stopped at Platform {selectedPlatformNumber}.");
     }
+
+private void DebugStation14()
+{
+    Debug.Log("===== 駅14デバッグ開始 =====");
+
+    for (int platform = 1; platform <= 4; platform++)
+    {
+        PlatformKey platformKey = new PlatformKey(14, platform);
+
+        int platformTrainId;
+
+        if (stoppedTrains.TryGetValue(platformKey, out platformTrainId))
+        {
+            TrainState platformTrain;
+
+            if (trains.TryGetValue(platformTrainId, out platformTrain))
+            {
+                Debug.Log(
+                    "駅14の" + platform + "番ホーム：" +
+                    "電車" + platformTrainId +
+                    "、路線" + platformTrain.RouteId +
+                    "、状態" + platformTrain.State +
+                    "、現在駅" + platformTrain.CurrentStation
+                );
+            }
+        }
+        else
+        {
+            Debug.Log(
+                "駅14の" + platform + "番ホーム：登録なし"
+            );
+        }
+    }
+
+    foreach (int checkTrainId in sortedTrainIds)
+    {
+        TrainState checkTrain = trains[checkTrainId];
+
+        if (checkTrain.RouteId == 6)
+        {
+            Debug.Log(
+                "路線6の電車" + checkTrain.TrainId +
+                "、状態：" + checkTrain.State +
+                "、現在駅：" + checkTrain.CurrentStation +
+                "、現在ホーム：" + checkTrain.CurrentPlatform +
+                "、次の駅：" + checkTrain.NextStation +
+                "、予約ホーム：" + checkTrain.ReservedPlatform +
+                "、残り時間：" + checkTrain.RemainingSeconds
+            );
+        }
+    }
+
+    Debug.Log("===== 駅14デバッグ終了 =====");
+}
 
     private void SetMessage(string message)
     {

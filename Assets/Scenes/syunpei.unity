@@ -3535,7 +3535,7 @@ MonoBehaviour:
   resultStatusText: {fileID: 0}
   rankText: {fileID: 65901827}
   scoreText: {fileID: 0}
-  initialTrainIntervalSeconds: 0.35
+  initialTrainIntervalSeconds: 0.3
   logTrainEvents: 0
 --- !u!114 &1971601028
 MonoBehaviour:
