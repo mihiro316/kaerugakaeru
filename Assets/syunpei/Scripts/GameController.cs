@@ -127,6 +127,12 @@ public class GameController : MonoBehaviour
     private readonly List<MoveRequest> moveRequests = new List<MoveRequest>();
     private readonly List<int> sortedTrainIds = new List<int>();
 
+    [SerializeField] private GameObject inTrainBackGround; 
+    [SerializeField] private List<Sprite> inTrainBackGroundSprite;
+    private Image inTrainBackgroundImage;
+
+
+
     private readonly int[][] routes =
     {
         new[] { 1, 2, 3, 4 }, new[] { 1, 30, 29 }, new[] { 4, 5, 6 },
@@ -145,6 +151,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        inTrainBackgroundImage = inTrainBackGround.GetComponent<Image>();
         StartBgm();
         ApplyGameModeImmediately(GameMode.Game);
     }
@@ -356,6 +363,8 @@ public class GameController : MonoBehaviour
         SetObjectActive(trainScreen, !atStation);
         if (atStation) UpdateStationVisuals();
         else SetSprite(trainBackgroundImage, trainBackgroundSprite);
+        
+        inTrainBackGround.SetActive(!atStation);
     }
 
     private void UpdateStationVisuals()
@@ -946,20 +955,15 @@ trainStopPositions[train.TrainId] = key;
         {
             if (playerState == PlayerState.InTrain)
             {
-                trainStatusTextBox.gameObject.SetActive(true);
 
                 if (ridingTrainIsStopped)
                 {
-                    trainStatusText.text = "停車中";
+                    inTrainBackgroundImage.sprite = inTrainBackGroundSprite[0];
                 }
                 else
                 {
-                    trainStatusText.text = "走行中";
+                    inTrainBackgroundImage.sprite = inTrainBackGroundSprite[1];
                 }
-            }
-            else
-            {
-                trainStatusTextBox.gameObject.SetActive(false);
             }
         }
 
