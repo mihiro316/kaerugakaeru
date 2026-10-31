@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] int allFoods;  //出てくる料理数
     private float clearTime;     //クリア時間
     [SerializeField] List<float> scoreTime; //クリアタイムのスコアの閾値
+
+    [SerializeField] private GameObject scoreGameObject;
+    [SerializeField] private TextMeshProUGUI score;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -62,6 +66,8 @@ public class GameManager : MonoBehaviour
             Destroy(nowFood);
             clearTime = Time.time - clearTime;
             Debug.Log(clearTime);
+            scoreGameObject.SetActive(true);
+            score.text = ((int)clearTime).ToString();
         }
     }
 }
