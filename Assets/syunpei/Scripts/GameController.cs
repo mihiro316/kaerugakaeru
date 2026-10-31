@@ -497,7 +497,7 @@ public class GameController : MonoBehaviour
         train.CurrentPlatform = platform;
         train.State = TrainMotionState.Stopped;
         train.RemainingSeconds = TerminalStopSeconds;
-        if (logTrainEvents) Debug.Log($"Train {train.TrainId} initially placed at Station {train.CurrentStation}, Platform {platform}.");
+        // if (logTrainEvents) Debug.Log($"Train {train.TrainId} initially placed at Station {train.CurrentStation}, Platform {platform}.");
         if (playerState == PlayerState.AtStation && currentStation == train.CurrentStation) UpdateStationVisuals();
     }
 
@@ -592,21 +592,21 @@ public class GameController : MonoBehaviour
                 request.ToStation
             );
 
-            if (destinationPlatform < 1)
-            {
-                if (request.FromStation == 9 ||
-                    request.FromStation == 12)
-                {
-                    Debug.Log(
-                        "駅" + request.FromStation +
-                        "の電車" + train.TrainId +
-                        "は、駅" + request.ToStation +
-                        "のホームが空いていないため発車できません"
-                    );
-                }
+            // if (destinationPlatform < 1)
+            // {
+            //     if (request.FromStation == 9 ||
+            //         request.FromStation == 12)
+            //     {
+            //         Debug.Log(
+            //             "駅" + request.FromStation +
+            //             "の電車" + train.TrainId +
+            //             "は、駅" + request.ToStation +
+            //             "のホームが空いていないため発車できません"
+            //         );
+            //     }
 
-                continue;
-            }
+            //     continue;
+            // }
 
             if (occupiedTracks.ContainsKey(track))
             {
@@ -616,14 +616,14 @@ public class GameController : MonoBehaviour
                     int blockingTrainId =
                         occupiedTracks[track];
 
-                    Debug.Log(
-                        "駅" + request.FromStation +
-                        "の電車" + train.TrainId +
-                        "は、駅" + request.ToStation +
-                        "までの線路を電車" +
-                        blockingTrainId +
-                        "が使用しているため発車できません"
-                    );
+                    // Debug.Log(
+                    //     "駅" + request.FromStation +
+                    //     "の電車" + train.TrainId +
+                    //     "は、駅" + request.ToStation +
+                    //     "までの線路を電車" +
+                    //     blockingTrainId +
+                    //     "が使用しているため発車できません"
+                    // );
                 }
 
                 continue;
@@ -664,16 +664,16 @@ public class GameController : MonoBehaviour
                 );
             }
 
-            if (logTrainEvents)
-            {
-                Debug.Log(
-                    "Train " + train.TrainId +
-                    " departed Station " +
-                    request.FromStation +
-                    " for Station " +
-                    request.ToStation + "."
-                );
-            }
+            // if (logTrainEvents)
+            // {
+            //     Debug.Log(
+            //         "Train " + train.TrainId +
+            //         " departed Station " +
+            //         request.FromStation +
+            //         " for Station " +
+            //         request.ToStation + "."
+            //     );
+            // }
 
             moveRequests.RemoveAt(i);
             moved = true;
@@ -717,7 +717,7 @@ trainStopPositions[train.TrainId] = key;
             SetMessage($"Arrived at Station {train.CurrentStation}. Press Up or W to get off.");
         }
         if (playerState == PlayerState.AtStation && currentStation == train.CurrentStation) UpdateStationVisuals();
-        if (logTrainEvents) Debug.Log($"Train {train.TrainId} arrived at Station {train.CurrentStation}, Platform {train.CurrentPlatform}.");
+        // if (logTrainEvents) Debug.Log($"Train {train.TrainId} arrived at Station {train.CurrentStation}, Platform {train.CurrentPlatform}.");
     }
 
     private void ReleaseCurrentPlatform(TrainState train)
@@ -998,7 +998,7 @@ trainStopPositions[train.TrainId] = key;
 
 private void DebugStation14()
 {
-    Debug.Log("===== 駅14デバッグ開始 =====");
+    // Debug.Log("===== 駅14デバッグ開始 =====");
 
     for (int platform = 1; platform <= 4; platform++)
     {
@@ -1010,50 +1010,50 @@ private void DebugStation14()
         {
             TrainState platformTrain;
 
-            if (trains.TryGetValue(platformTrainId, out platformTrain))
-            {
-                Debug.Log(
-                    "駅14の" + platform + "番ホーム：" +
-                    "電車" + platformTrainId +
-                    "、路線" + platformTrain.RouteId +
-                    "、状態" + platformTrain.State +
-                    "、現在駅" + platformTrain.CurrentStation
-                );
-            }
+            // if (trains.TryGetValue(platformTrainId, out platformTrain))
+            // {
+            //     Debug.Log(
+            //         "駅14の" + platform + "番ホーム：" +
+            //         "電車" + platformTrainId +
+            //         "、路線" + platformTrain.RouteId +
+            //         "、状態" + platformTrain.State +
+            //         "、現在駅" + platformTrain.CurrentStation
+            //     );
+            // }
         }
-        else
-        {
-            Debug.Log(
-                "駅14の" + platform + "番ホーム：登録なし"
-            );
-        }
+        // else
+        // {
+        //     Debug.Log(
+        //         "駅14の" + platform + "番ホーム：登録なし"
+        //     );
+        // }
     }
 
     foreach (int checkTrainId in sortedTrainIds)
     {
         TrainState checkTrain = trains[checkTrainId];
 
-        if (checkTrain.RouteId == 6)
-        {
-            Debug.Log(
-                "路線6の電車" + checkTrain.TrainId +
-                "、状態：" + checkTrain.State +
-                "、現在駅：" + checkTrain.CurrentStation +
-                "、現在ホーム：" + checkTrain.CurrentPlatform +
-                "、次の駅：" + checkTrain.NextStation +
-                "、予約ホーム：" + checkTrain.ReservedPlatform +
-                "、残り時間：" + checkTrain.RemainingSeconds
-            );
-        }
+        // if (checkTrain.RouteId == 6)
+        // {
+        //     Debug.Log(
+        //         "路線6の電車" + checkTrain.TrainId +
+        //         "、状態：" + checkTrain.State +
+        //         "、現在駅：" + checkTrain.CurrentStation +
+        //         "、現在ホーム：" + checkTrain.CurrentPlatform +
+        //         "、次の駅：" + checkTrain.NextStation +
+        //         "、予約ホーム：" + checkTrain.ReservedPlatform +
+        //         "、残り時間：" + checkTrain.RemainingSeconds
+        //     );
+        // }
     }
 
-    Debug.Log("===== 駅14デバッグ終了 =====");
+    // Debug.Log("===== 駅14デバッグ終了 =====");
 }
 
     private void SetMessage(string message)
     {
         if (messageText != null) messageText.text = message;
-        if (logTrainEvents) Debug.Log(message);
+        // if (logTrainEvents) Debug.Log(message);
     }
 
     private static void SetObjectActive(GameObject target, bool active)
