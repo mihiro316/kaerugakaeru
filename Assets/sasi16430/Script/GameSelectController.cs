@@ -89,9 +89,9 @@ public class GameSelectController : MonoBehaviour
         Vector2 input = context.ReadValue<Vector2>();
 
         if (input.y > 0.5f)
-            StartCoroutine(MoveCards(1));
-        else if (input.y < -0.5f)
             StartCoroutine(MoveCards(-1));
+        else if (input.y < -0.5f)
+            StartCoroutine(MoveCards(1));
     }
 
     private IEnumerator MoveCards(int direction)
