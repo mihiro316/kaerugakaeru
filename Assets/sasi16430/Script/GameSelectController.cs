@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class GameSelectController : MonoBehaviour
 {
@@ -18,12 +19,21 @@ public class GameSelectController : MonoBehaviour
     private bool isAnimating;
     private bool enabledInput;
 
+    [SerializeField] private string[] sceneNames;
+
+    private InputAction selectAction;
+
     private void Awake()
     {
         navigateAction = inputActions
             .FindActionMap("UI", true)
             .FindAction("Navigate", true);
 
+        SetInitialPosition();
+        
+        selectAction = inputActions
+            .FindActionMap("UI", true)
+          .FindAction("Select", true);
         SetInitialPosition();
     }
 
@@ -36,6 +46,14 @@ public class GameSelectController : MonoBehaviour
             navigateAction.Enable();
             enabledInput = true;
         }
+
+        selectAction.performed += selectGame;
+
+        if (!selectAction.enabled)
+        {
+            selectAction.Enable();
+        }
+
     }
 
     private void OnDisable()
@@ -142,5 +160,10 @@ public class GameSelectController : MonoBehaviour
             new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * radius;
 
         card.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    private void selectGame(InputAction.CallbackContext context)
+    {
+        SceneManager.LoadScene(sceneNames[currentIndex]);
     }
 }
