@@ -89,9 +89,14 @@ public class GameSelectController : MonoBehaviour
         Vector2 input = context.ReadValue<Vector2>();
 
         if (input.y > 0.5f)
-            StartCoroutine(MoveCards(-1));
-        else if (input.y < -0.5f)
             StartCoroutine(MoveCards(1));
+        else if (input.y < -0.5f)
+            StartCoroutine(MoveCards(-1));
+    }
+
+    public void onSwitchUpDown(int direction)
+    {
+        StartCoroutine(MoveCards(direction));
     }
 
     private IEnumerator MoveCards(int direction)
@@ -162,6 +167,11 @@ public class GameSelectController : MonoBehaviour
         card.localRotation = Quaternion.Euler(0f, 0f, angle);
     }
 
+    public void onSwitchSelect()
+    {
+        SceneManager.LoadScene(sceneNames[currentIndex]);
+    }
+    
     private void selectGame(InputAction.CallbackContext context)
     {
         SceneManager.LoadScene(sceneNames[currentIndex]);
