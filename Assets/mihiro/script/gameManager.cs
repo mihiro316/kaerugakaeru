@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,11 +16,20 @@ public class GameManager : MonoBehaviour
     [SerializeField]private AudioClip goodSe;
     [SerializeField]private AudioClip badSe;
 
+    private int foodsCount = -1;     //出てきた料理数
+    [SerializeField] int allFoods;  //出てくる料理数
+    private float clearTime;     //クリア時間
+    [SerializeField] List<float> scoreTime; //クリアタイムのスコアの閾値
+
+    [SerializeField] private GameObject scoreGameObject;
+    [SerializeField] private TextMeshProUGUI score;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         menueSr = menue.GetComponent<SpriteRenderer>();
         gameManagerSc = GetComponent<GameManager>();
+        clearTime = Time.time;
         Change();
     }
 
@@ -44,8 +54,20 @@ public class GameManager : MonoBehaviour
 
     public void Change()
     {
-        int n = Random.Range(0,foods.Count);
-        ChangeFood(n);
-        ChangeMenue(n);
+        foodsCount ++;
+        if (foodsCount < allFoods)  //料理がまだあるなら
+        {
+            int n = Random.Range(0,foods.Count);
+            ChangeFood(n);
+            ChangeMenue(n);
+        }
+        else
+        {
+            Destroy(nowFood);
+            clearTime = Time.time - clearTime;
+            Debug.Log(clearTime);
+            scoreGameObject.SetActive(true);
+            score.text = ((int)clearTime).ToString();
+        }
     }
 }
