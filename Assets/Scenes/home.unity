@@ -175,12 +175,13 @@ MonoBehaviour:
   - {fileID: 1813391304}
   - {fileID: 1631084788}
   - {fileID: 1896721675}
+  radius: 1000
+  angleSpacing: 32
   animationDuration: 0.35
-  centerPosition: {x: 0, y: 0}
-  upperLeftPosition: {x: -800, y: 500}
-  lowerLeftPosition: {x: -800, y: -500}
-  upperRightPosition: {x: 800, y: 500}
-  lowerRightPosition: {x: 800, y: -500}
+  sceneNames:
+  - title
+  - syunpei
+  - mihiro
 --- !u!1 &740569339
 GameObject:
   m_ObjectHideFlags: 0
