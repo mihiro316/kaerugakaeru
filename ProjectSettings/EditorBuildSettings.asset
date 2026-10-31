@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/gokiburitai/slidepuzzle/slidepuzzle.unity
     guid: 9c90be85e892b7147ac9f1ae9de8c81f
+  - enabled: 1
+    path: Assets/Scenes/home.unity
+    guid: 80b2ae45e78b944a0afbb273e249930f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
