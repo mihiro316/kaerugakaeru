@@ -130,6 +130,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject inTrainBackGround; 
     [SerializeField] private List<Sprite> inTrainBackGroundSprite;
     private Image inTrainBackgroundImage;
+    [SerializeField] private GameObject clearObj;
 
 
 
@@ -893,7 +894,7 @@ trainStopPositions[train.TrainId] = key;
         int minimum = shortestDistance[startStation - 1, goalStation - 1];
         lastRank = reachedGoal && minimum > 0 ? CalculateRank((float)actualTravelDistance / minimum) : "C";
         lastScore = actualTravelDistance;
-        StartCoroutine(ChangeGameModeWithFade(GameMode.Result));
+        clearObj.SetActive(true);
     }
 
     private string CalculateRank(float ratio)
